@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: todolist
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/todolist_db
+    username: todolist_user
+    password: todolist_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
