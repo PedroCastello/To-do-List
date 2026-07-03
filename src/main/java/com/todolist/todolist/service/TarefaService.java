@@ -6,8 +6,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.todolist.todolist.dto.AtualizaStatusDTO;
+import com.todolist.todolist.dto.TarefaRequestDTO;
 import com.todolist.todolist.dto.TarefaResponseDTO;
 import com.todolist.todolist.entity.Tarefa;
+import com.todolist.todolist.entity.StatusTarefa;
 import com.todolist.todolist.repository.TarefaRepository;
 
 @Service
@@ -31,6 +34,39 @@ public class TarefaService {
                 .orElseThrow(() -> new NoSuchElementException("Tarefa não encontrada com o id " + id));
 
         return toResponseDTO(tarefa);
+    }
+
+    public TarefaResponseDTO criar(TarefaRequestDTO requestDTO) {
+        Tarefa tarefa = new Tarefa();
+        tarefa.setTitulo(requestDTO.getTitulo());
+        tarefa.setDescricao(requestDTO.getDescricao());
+        tarefa.setPrazo(requestDTO.getPrazo());
+        tarefa.setStatus(StatusTarefa.PENDENTE);
+
+        Tarefa tarefaSalva = tarefaRepository.save(tarefa);
+        return toResponseDTO(tarefaSalva);
+    }
+
+    public TarefaResponseDTO atualizar(Long id, TarefaRequestDTO requestDTO) {
+        Tarefa tarefaExistente = tarefaRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Tarefa não encontrada com o id " + id));
+
+        tarefaExistente.setTitulo(requestDTO.getTitulo());
+        tarefaExistente.setDescricao(requestDTO.getDescricao());
+        tarefaExistente.setPrazo(requestDTO.getPrazo());
+
+        Tarefa tarefaAtualizada = tarefaRepository.save(tarefaExistente);
+        return toResponseDTO(tarefaAtualizada);
+    }
+
+    public TarefaResponseDTO atualizarStatus(Long id, AtualizaStatusDTO atualizaStatusDTO) {
+        Tarefa tarefaExistente = tarefaRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Tarefa não encontrada com o id " + id));
+
+        tarefaExistente.setStatus(atualizaStatusDTO.getStatus());
+
+        Tarefa tarefaAtualizada = tarefaRepository.save(tarefaExistente);
+        return toResponseDTO(tarefaAtualizada);
     }
 
 
