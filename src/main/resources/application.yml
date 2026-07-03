@@ -3,7 +3,7 @@ spring:
     name: todolist
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/todolist_db
+    url: jdbc:postgresql://localhost:5433/todolist_db
     username: todolist_user
     password: todolist_pass
 
