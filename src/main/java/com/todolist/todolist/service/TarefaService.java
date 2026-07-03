@@ -1,7 +1,6 @@
 package com.todolist.todolist.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -11,6 +10,7 @@ import com.todolist.todolist.dto.TarefaRequestDTO;
 import com.todolist.todolist.dto.TarefaResponseDTO;
 import com.todolist.todolist.entity.Tarefa;
 import com.todolist.todolist.entity.StatusTarefa;
+import com.todolist.todolist.exception.TarefaNaoEncontradaException;
 import com.todolist.todolist.repository.TarefaRepository;
 
 @Service
@@ -31,7 +31,7 @@ public class TarefaService {
 
     public TarefaResponseDTO buscarPorId(Long id) {
         Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Tarefa não encontrada com o id " + id));
+                .orElseThrow(() -> new TarefaNaoEncontradaException("Tarefa não encontrada com o id " + id));
 
         return toResponseDTO(tarefa);
     }
@@ -49,7 +49,7 @@ public class TarefaService {
 
     public TarefaResponseDTO atualizar(Long id, TarefaRequestDTO requestDTO) {
         Tarefa tarefaExistente = tarefaRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Tarefa não encontrada com o id " + id));
+                .orElseThrow(() -> new TarefaNaoEncontradaException("Tarefa não encontrada com o id " + id));
 
         tarefaExistente.setTitulo(requestDTO.getTitulo());
         tarefaExistente.setDescricao(requestDTO.getDescricao());
@@ -59,14 +59,22 @@ public class TarefaService {
         return toResponseDTO(tarefaAtualizada);
     }
 
-    public TarefaResponseDTO atualizarStatus(Long id, AtualizaStatusDTO atualizaStatusDTO) {
+    public TarefaResponseDTO atualizarStatus(Long id, AtualizaStatusDTO requestDTO) {
         Tarefa tarefaExistente = tarefaRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Tarefa não encontrada com o id " + id));
+                .orElseThrow(() -> new TarefaNaoEncontradaException("Tarefa não encontrada com o id " + id));
 
-        tarefaExistente.setStatus(atualizaStatusDTO.getStatus());
+        tarefaExistente.setStatus(requestDTO.getStatus());
 
         Tarefa tarefaAtualizada = tarefaRepository.save(tarefaExistente);
         return toResponseDTO(tarefaAtualizada);
+    }
+
+    public void deletar(Long id) {
+        if (!tarefaRepository.existsById(id)) {
+            throw new TarefaNaoEncontradaException("Tarefa não encontrada com o id " + id);
+        }
+
+        tarefaRepository.deleteById(id);
     }
 
 
